@@ -1,0 +1,148 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    text-align: center;
+    margin: .5em auto;
+    max-width: 75%;
+}
+
+h1 {
+    font: normal 4em/1 monospace;
+}
+
+h1 span {
+    color: #999;
+}
+
+.item {
+    display: inline-block;
+    overflow: hidden;
+    background-size: cover;
+    position: relative;
+    color: #fff;
+    text-decoration: none;
+}
+
+.item:hover {
+    outline: .4em solid #ccc;
+    -webkit-filter: grayscale(100%);
+}
+
+.outline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
+
+    -webkit-transition: background-color .1s;
+    -moz-transition: background-color .1s;
+    -o-transition: background-color .1s;
+    -ms-transition: background-color .1s;
+    transition: background-color .1s;
+}
+
+.item:hover .outline {
+    background-color: rgba(0, 0, 0, .7);
+    opacity: 1;
+
+    -webkit-transition: background-color .1s;
+    -moz-transition: background-color .1s;
+    -o-transition: background-color .1s;
+    -ms-transition: background-color .1s;
+    transition: background-color .1s;
+}
+
+.year, .title, .genres {
+    display: block;
+    padding: 0 .25em;
+    text-shadow: 0 0 1px #fff;
+}
+
+.year {
+    margin-top: 1em;
+    font-size: 2em;
+}
+
+.title {
+    font-size: 3em;
+    margin: .5em 0;
+}
+
+.genres {
+    font-size: 1em;
+}
+
+.rating {
+    font-size: 4em;
+
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0 .15em;
+}
+
+.item {
+    width: 0;
+    height: 0;
+    margin: 0;
+
+    -webkit-transition: width .1s, height .1s;
+    -moz-transition: width .1s, height .1s;
+    -o-transition: width .1s, height .1s;
+    -ms-transition: width .1s, height .1s;
+    transition: width .1s, height .1s;
+}
+
+body.today .item.days-0,
+body.yesterday .item.days-0,
+body.yesterday .item.days-1,
+body.week .item.days-0,
+body.week .item.days-1,
+body.week .item.days-2,
+body.week .item.days-3,
+body.week .item.days-4,
+body.week .item.days-5,
+body.week .item.days-6,
+body.all .item {
+    width: 300px;
+    height: 476px;
+    margin: .2em;
+
+    -webkit-transition: width .1s, height .1s;
+    -moz-transition: width .1s, height .1s;
+    -o-transition: width .1s, height .1s;
+    -ms-transition: width .1s, height .1s;
+    transition: width .1s, height .1s;
+}
+
+#filter {
+    margin: 1em auto;
+}
+
+#filter a {
+    text-decoration: none;
+    color: #333;
+    padding: .25em .5em;
+}
+
+#filter a.active {
+    background-color: #333;
+    color: #fff;
+}
+
+@media screen and (max-width: 980px) {
+    body {
+        margin: .5em auto;
+        max-width: 100%;
+    }
+}
