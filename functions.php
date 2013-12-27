@@ -142,6 +142,12 @@ function check_feed($url)
                     continue;
                 }
 
+                if(!file_exists(__DIR__ . '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster']))))
+                {
+                    file_put_contents(__DIR__ . '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster'])), file_get_contents($data['poster']));
+                }
+                $data['poster'] = '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster']));
+
                 unset($data['description']);
                 $stmt = $pdo->prepare(
                     "INSERT INTO items
