@@ -24,7 +24,7 @@ function filter($text, $stopwords)
 
 function read_non_empty_lines($filname)
 {
-    return preg_split('/(\r\n|\n)+/', file_get_contents($filname), -1, PREG_SPLIT_NO_EMPTY);
+    return preg_split('/(\r\n|\n)+/', file_get_contents(__DIR__ . '/' . $filname), -1, PREG_SPLIT_NO_EMPTY);
 }
 
 function get_stopwords()
