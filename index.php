@@ -14,7 +14,7 @@ require_once 'config.php';
 
 $pdo = get_pdo();
 
-foreach ($pdo->query("SELECT * FROM items ORDER BY added DESC LIMIT 100") as $row):?>
+foreach ($pdo->query("SELECT * FROM items ORDER BY added DESC, rating DESC LIMIT 100") as $row):?>
 
     <a target="_blank" href="<?= $row['link'] ?>" class="item <?= date_class($row['added']) ?>"
        style="background-image:url(<?= $row['poster'] ?>);">
