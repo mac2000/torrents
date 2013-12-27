@@ -53,12 +53,12 @@ function get_imdb_info($description)
     $imdb = json_decode(file_get_contents('http://omdbapi.com/?i=' . $imdb_id), true);
 
     return array(
-        'imdb' => $imdb['imdbID'],
-        'title' => $imdb['Title'],
-        'year' => $imdb['Year'],
-        'poster' => $imdb['Poster'],
-        'rating' => $imdb['imdbRating'],
-        'genres' => $imdb['Genre']
+        'imdb' => isset($imdb['imdbID']) ? $imdb['imdbID'] : null,
+        'title' => isset($imdb['Title']) ? $imdb['Title'] : null,
+        'year' => isset($imdb['Year']) ? $imdb['Year'] : null,
+        'poster' => isset($imdb['Poster']) ? $imdb['Poster'] : null,
+        'rating' => isset($imdb['imdbRating']) ? $imdb['imdbRating'] : null,
+        'genres' => isset($imdb['Genre']) ? $imdb['Genre'] : null
     );
 }
 

@@ -11,6 +11,7 @@ $feeds = $arg ? array($arg) : get_feeds();
 
 foreach ($feeds as $url) {
     try {
+    	sleep(1);
         check_feed($url);
     } catch (Exception $ex) {
         echo $ex->getMessage() . gnl();
