@@ -1,5 +1,4 @@
 <?php
-require_once 'config.php';
 
 function date_class($added)
 {
@@ -91,6 +90,86 @@ function image_path($imdb_id, $poster)
     return '/images/' . date('Y/m/d') . '/' . $imdb_id . '.' . array_pop(explode('.', $poster));
 }
 
+function is_item_already_checked(PDO $pdo, $link)
+{
+    $stmt = $pdo->prepare("SELECT link FROM items WHERE link = :link");
+    $stmt->execute(array('link' => $link));
+    return $stmt->rowCount() > 0;
+}
+
+function save_item(PDO $pdo, $data)
+{
+    if (isset($data['description'])) {
+        unset($data['description']);
+    }
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO items
+            (imdb, title, year, poster, rating, link, genres, added)
+            VALUES(:imdb, :title, :year, :poster, :rating, :link, :genres, :added)"
+    );
+
+    $stmt->execute($data);
+}
+
+function save_poster($imdb_id, $poster)
+{
+    $image_path = image_path($imdb_id, $poster);
+    if (!file_exists(dirname(__DIR__ . $image_path))) {
+        mkdir(dirname(__DIR__ . $image_path), 0775, true);
+    }
+    if (!file_exists(__DIR__ . $image_path)) {
+        file_put_contents(__DIR__ . $image_path, file_get_contents($poster));
+    }
+    return $image_path;
+}
+
+function check_item(SimplePie_Item $item, PDO $pdo, $stopwords = array())
+{
+    $data = array(
+        'link' => $item->get_link(),
+        'title' => $item->get_title(),
+        'description' => $item->get_description(),
+        'added' => $item->get_date('Y-m-d H:i:s')
+    );
+
+    $data['added'] = $data['added'] ? $data['added'] : date('Y-m-d H:i:s', time());
+
+    if (is_item_already_checked($pdo, $data['link'])) {
+        return;
+    }
+
+    if (filter($data['title'], $stopwords)) {
+        return;
+    }
+
+    if (empty($data['description'])) {
+        $data['description'] = file_get_contents($data['link']);
+    }
+
+    if (filter($data['description'], $stopwords)) {
+        return;
+    }
+
+    $data = array_merge($data, get_imdb_info($data['description']));
+
+    if (!isset($data['imdb'])) {
+        return;
+    }
+
+    if ($data['rating'] < 5) {
+        return;
+    }
+
+    if (!$data['poster'] || $data['poster'] == 'N/A') {
+        return;
+    }
+
+    $data['poster'] = save_poster($data['imdb'], $data['poster']);
+
+    save_item($pdo, $data);
+}
+
 function check_feed($url)
 {
     $stopwords = get_stopwords();
@@ -104,66 +183,7 @@ function check_feed($url)
 
         foreach ($feed->get_items() as $item) {
             try {
-
-                /* @var $item SimplePie_Item */
-                $data = array(
-                    'link' => $item->get_link(),
-                    'title' => $item->get_title(),
-                    'description' => $item->get_description(),
-                    'added' => $item->get_date('Y-m-d H:i:s')
-                );
-
-                $data['added'] = $data['added'] ? $data['added'] : date('Y-m-d H:i:s', time());
-
-                $stmt = $pdo->prepare("SELECT link FROM items WHERE link = :link");
-                $stmt->execute(array('link' => $data['link']));
-                if ($stmt->rowCount()) {
-                    continue;
-                }
-
-                if (filter($data['title'], $stopwords)) {
-                    continue;
-                }
-
-                if (empty($data['description'])) {
-                    $data['description'] = file_get_contents($data['link']);
-                }
-
-                if (filter($data['description'], $stopwords)) {
-                    continue;
-                }
-
-                $data = array_merge($data, get_imdb_info($data['description']));
-
-                if (!isset($data['imdb'])) {
-                    continue;
-                }
-
-                if ($data['rating'] < 5) {
-                    continue;
-                }
-
-                if (!$data['poster'] || $data['poster'] == 'N/A') {
-                    continue;
-                }
-
-                $image_path = image_path($data['imdb'], $data['poster']);
-                if (!file_exists(dirname(__DIR__ . $image_path))) {
-                    mkdir(dirname(__DIR__ . $image_path), 0775, true);
-                }
-                if (!file_exists(__DIR__ . $image_path)) {
-                    file_put_contents(__DIR__ . $image_path, file_get_contents($data['poster']));
-                }
-                $data['poster'] = $image_path;
-
-                unset($data['description']);
-                $stmt = $pdo->prepare(
-                    "INSERT INTO items
-                        (imdb, title, year, poster, rating, link, genres, added)
-                        VALUES(:imdb, :title, :year, :poster, :rating, :link, :genres, :added)"
-                );
-                $stmt->execute($data);
-
+                check_item($item, $pdo, $stopwords);
             } catch (Exception $ex) {
                 echo $ex->getMessage() . gnl();
             }
