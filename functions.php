@@ -86,6 +86,11 @@ function enl()
     echo gnl();
 }
 
+function image_path($imdb_id, $poster)
+{
+    return '/images/' . date('Y/m/d') . '/' . $imdb_id . '.' . array_pop(explode('.', $poster));
+}
+
 function check_feed($url)
 {
     $stopwords = get_stopwords();
@@ -142,11 +147,14 @@ function check_feed($url)
                     continue;
                 }
 
-                if(!file_exists(__DIR__ . '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster']))))
-                {
-                    file_put_contents(__DIR__ . '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster'])), file_get_contents($data['poster']));
+                $image_path = image_path($data['imdb'], $data['poster']);
+                if (!file_exists(dirname(__DIR__ . $image_path))) {
+                    mkdir(dirname(__DIR__ . $image_path), 0775, true);
                 }
-                $data['poster'] = '/images/' . $data['imdb'] . '.' . array_pop(explode('.', $data['poster']));
+                if (!file_exists(__DIR__ . $image_path)) {
+                    file_put_contents(__DIR__ . $image_path, file_get_contents($data['poster']));
+                }
+                $data['poster'] = $image_path;
 
                 unset($data['description']);
                 $stmt = $pdo->prepare(
