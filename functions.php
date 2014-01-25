@@ -14,7 +14,7 @@ function date_class($added)
 function filter($text, $stopwords)
 {
     foreach ($stopwords as $stopword) {
-        if (stripos($text, $stopword) !== false) {
+        if (stripos(urlencode($text), urlencode($stopword)) !== false) {
             return true;
         }
     }
@@ -23,7 +23,7 @@ function filter($text, $stopwords)
 
 function read_non_empty_lines($filname)
 {
-    return preg_split('/(\r\n|\n)+/', file_get_contents(__DIR__ . '/' . $filname), -1, PREG_SPLIT_NO_EMPTY);
+    return file($filname, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 }
 
 function get_stopwords()
@@ -144,7 +144,10 @@ function check_item(SimplePie_Item $item, PDO $pdo, $stopwords = array())
     }
 
     if (empty($data['description'])) {
-        $data['description'] = file_get_contents($data['link']);
+        $data['description'] = @file_get_contents($data['link']);
+        if (stripos($data['description'], 'windows-1251') !== false) {
+            $data['description'] = @iconv('windows-1251', 'UTF-8', $data['description']);
+        }
     }
 
     if (filter($data['description'], $stopwords)) {
