@@ -14,9 +14,12 @@ function date_class($added)
 function filter($text, $stopwords)
 {
     foreach ($stopwords as $stopword) {
-        if (stripos(urlencode($text), urlencode($stopword)) !== false) {
+        if (stripos($text, $stopword) !== false) {
             return true;
         }
+        //if (stripos(urlencode($text), urlencode($stopword)) !== false) {
+        //    return true;
+        //}
     }
     return false;
 }
@@ -145,9 +148,9 @@ function check_item(SimplePie_Item $item, PDO $pdo, $stopwords = array())
 
     if (empty($data['description'])) {
         $data['description'] = @file_get_contents($data['link']);
-        if (stripos($data['description'], 'windows-1251') !== false) {
-            $data['description'] = @iconv('windows-1251', 'UTF-8', $data['description']);
-        }
+        //if (stripos($data['description'], 'windows-1251') !== false) {
+        //    $data['description'] = @iconv('windows-1251', 'UTF-8', $data['description']);
+        //}
     }
 
     if (filter($data['description'], $stopwords)) {
