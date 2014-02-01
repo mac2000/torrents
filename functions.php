@@ -31,12 +31,12 @@ function read_non_empty_lines($filname)
 
 function get_stopwords()
 {
-    return read_non_empty_lines('stopwords.txt');
+    return read_non_empty_lines(__DIR__ . '/stopwords.txt');
 }
 
 function get_feeds()
 {
-    return read_non_empty_lines('feeds.txt');
+    return read_non_empty_lines(__DIR__ . '/feeds.txt');
 }
 
 function get_imdb_id($description)
